@@ -1,0 +1,387 @@
+[
+    {
+        "id": "2e5a40a98501ad4c",
+        "type": "tab",
+        "label": "Water Condition",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6e044f13a96685a7",
+        "type": "json",
+        "z": "2e5a40a98501ad4c",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": true,
+        "x": 670,
+        "y": 320,
+        "wires": [
+            [
+                "78aba0cf5d3cbda5"
+            ]
+        ]
+    },
+    {
+        "id": "c1aabb9f382182a4",
+        "type": "influxdb out",
+        "z": "2e5a40a98501ad4c",
+        "influxdb": "03042b0e91f70470",
+        "name": "",
+        "measurement": "condition",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "univaq-se4gd",
+        "bucket": "water-safety",
+        "x": 2900,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "548af2e8892cec47",
+        "type": "mqtt in",
+        "z": "2e5a40a98501ad4c",
+        "name": "",
+        "topic": "/+/water/condition",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c64d38d97a893468",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 510,
+        "y": 380,
+        "wires": [
+            [
+                "6e044f13a96685a7"
+            ]
+        ]
+    },
+    {
+        "id": "78aba0cf5d3cbda5",
+        "type": "function",
+        "z": "2e5a40a98501ad4c",
+        "name": "cast float",
+        "func": "msg.payload.ph = parseFloat(msg.payload.ph);\nmsg.payload.turbidity = parseFloat(msg.payload.turbidity);\nmsg.payload.hardness = parseFloat(msg.payload.hardness);\nmsg.payload.trihalomethanes = parseFloat(msg.payload.trihalomethanes);\nmsg.payload.solids = parseFloat(msg.payload.solids);\nmsg.payload.chloramines = parseFloat(msg.payload.chloramines);\nmsg.payload.sulfate = parseFloat(msg.payload.sulfate);\nmsg.payload.conductivity = parseFloat(msg.payload.conductivity);\nmsg.payload.organic_carbon = parseFloat(msg.payload.organic_carbon);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 280,
+        "wires": [
+            [
+                "3c6ddd34ca83ffb6"
+            ]
+        ]
+    },
+    {
+        "id": "3c6ddd34ca83ffb6",
+        "type": "switch",
+        "z": "2e5a40a98501ad4c",
+        "name": "check ph",
+        "property": "payload.ph",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "6.5",
+                "vt": "num",
+                "v2": "8.5",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 940,
+        "y": 220,
+        "wires": [
+            [
+                "c4efa194de4a265d"
+            ],
+            [
+                "c613cf8dd9f29c07"
+            ]
+        ]
+    },
+    {
+        "id": "c4efa194de4a265d",
+        "type": "switch",
+        "z": "2e5a40a98501ad4c",
+        "name": "check total disolve solids",
+        "property": "payload.solids",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "500",
+                "vt": "num",
+                "v2": "1000",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1130,
+        "y": 200,
+        "wires": [
+            [
+                "6867f2bafa6df5ac"
+            ],
+            [
+                "c613cf8dd9f29c07"
+            ]
+        ]
+    },
+    {
+        "id": "6867f2bafa6df5ac",
+        "type": "switch",
+        "z": "2e5a40a98501ad4c",
+        "name": "check sulfate",
+        "property": "payload.chloramines",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "400",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1330,
+        "y": 160,
+        "wires": [
+            [
+                "1b5e81f089ee5ccb"
+            ],
+            [
+                "c613cf8dd9f29c07"
+            ]
+        ]
+    },
+    {
+        "id": "1b5e81f089ee5ccb",
+        "type": "switch",
+        "z": "2e5a40a98501ad4c",
+        "name": "check electronic conductivity",
+        "property": "payload.conductivity",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "400",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1540,
+        "y": 140,
+        "wires": [
+            [
+                "cc6b5e24a8ec8d1d"
+            ],
+            [
+                "c613cf8dd9f29c07"
+            ]
+        ]
+    },
+    {
+        "id": "cc6b5e24a8ec8d1d",
+        "type": "switch",
+        "z": "2e5a40a98501ad4c",
+        "name": "check trihalomethanes",
+        "property": "payload.trihalomethanes",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "80",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1780,
+        "y": 120,
+        "wires": [
+            [
+                "a67f99e85a5f6917"
+            ],
+            [
+                "c613cf8dd9f29c07"
+            ]
+        ]
+    },
+    {
+        "id": "a67f99e85a5f6917",
+        "type": "switch",
+        "z": "2e5a40a98501ad4c",
+        "name": "check turbidity",
+        "property": "payload.turbidity",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "5",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1980,
+        "y": 100,
+        "wires": [
+            [
+                "805afa335f4dd96e"
+            ],
+            [
+                "c613cf8dd9f29c07"
+            ]
+        ]
+    },
+    {
+        "id": "c613cf8dd9f29c07",
+        "type": "change",
+        "z": "2e5a40a98501ad4c",
+        "name": "set potability to undrinkable",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.potability",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2200,
+        "y": 280,
+        "wires": [
+            [
+                "3b394a150b296ffe"
+            ]
+        ]
+    },
+    {
+        "id": "805afa335f4dd96e",
+        "type": "change",
+        "z": "2e5a40a98501ad4c",
+        "name": "set potability to drinkable",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.potability",
+                "pt": "msg",
+                "to": "1",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2310,
+        "y": 120,
+        "wires": [
+            [
+                "3b394a150b296ffe"
+            ]
+        ]
+    },
+    {
+        "id": "3b394a150b296ffe",
+        "type": "function",
+        "z": "2e5a40a98501ad4c",
+        "name": "format field and tag for influx",
+        "func": "msg.payload = [\n    {\n        ph: msg.payload.ph,\n        hardness: msg.payload.hardness,\n        solids: msg.payload.solids,\n        chloramines: msg.payload.chloramines,\n        sulfate: msg.payload.sulfate,\n        conductivity: msg.payload.conductivity, \n        organic_carbon: msg.payload.organic_carbon,\n        trihalomethanes: msg.payload.trihalomethanes,\n        turbidity: msg.payload.turbidity,\n        potability: msg.payload.potability\n    },\n    {\n        location: msg.payload.location\n    }\n]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2560,
+        "y": 200,
+        "wires": [
+            [
+                "c1aabb9f382182a4"
+            ]
+        ]
+    },
+    {
+        "id": "03042b0e91f70470",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "docker-influx",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://172.17.0.3:8086",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "c64d38d97a893468",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "172.17.0.4",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
